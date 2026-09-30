@@ -1,0 +1,52 @@
+project = "OPTRIX"
+version = "0.0.1"
+
+[measurement.correctness]
+id = "M-001"
+unit = "pass/fail"
+description = "Whether execution matches defined OPTRIX semantics."
+
+[measurement.performance]
+id = "M-002"
+unit = "milliseconds"
+description = "Execution time of a defined workload."
+
+[measurement.throughput]
+id = "M-003"
+unit = "operations_per_second"
+description = "Useful computation completed per unit time."
+
+[measurement.portability]
+id = "M-004"
+unit = "source_variants"
+description = "Number of target-specific source variants required."
+
+[measurement.developer_effort]
+id = "M-005"
+unit = "measured_steps"
+description = "Target-specific work required from the programmer."
+
+[measurement.compile_time]
+id = "M-006"
+unit = "milliseconds"
+description = "Time required to compile a workload."
+
+[measurement.runtime_overhead]
+id = "M-007"
+unit = "milliseconds"
+description = "Additional execution overhead introduced by OPTRIX runtime."
+
+[measurement.memory_usage]
+id = "M-008"
+unit = "bytes"
+description = "Peak memory consumed during execution."
+
+[measurement.source_changes]
+id = "M-009"
+unit = "lines"
+description = "Target-specific source changes required."
+
+[measurement.reproducibility]
+id = "M-010"
+unit = "pass/fail"
+description = "Whether an experiment can be reproduced from repository instructions."
