@@ -1,0 +1,28 @@
+project = "OPTRIX"
+version = "0.0.1"
+
+[project_status]
+current_phase = "Phase 0"
+current_stage = "Stage 0.3"
+current_brick = "Brick 0.3.2"
+current_part = "Part 0.3.2-A"
+status = "in_progress"
+
+[progress]
+phases_completed = 0
+stages_completed = 2
+bricks_completed = 3
+parts_completed = 0
+
+[active_work]
+phase = "0"
+stage = "0.3"
+brick = "0.3.2"
+part = "0.3.2-A"
+name = "Project Status Engine"
+
+[completion_rules]
+implementation_required = true
+test_required = true
+proof_required = true
+documentation_alone_is_insufficient = true
