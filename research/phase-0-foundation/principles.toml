@@ -1,0 +1,38 @@
+project = "OPTRIX"
+version = "0.0.1"
+
+[principle.universal_by_default]
+id = "P-001"
+status = "active"
+rule = "Target-independent computation should be expressed through the universal OPTRIX model by default."
+test = "A target-independent program should not require target-specific source code to execute on a supported target."
+
+[principle.specialized_when_necessary]
+id = "P-002"
+status = "active"
+rule = "Hardware-specific capabilities may be exposed when universal abstraction is insufficient."
+test = "Specialized operations must have explicitly documented semantics and target requirements."
+
+[principle.correctness_before_optimization]
+id = "P-003"
+status = "active"
+rule = "Correctness must be established before performance optimization is considered successful."
+test = "An optimization is accepted only when semantic equivalence has been verified."
+
+[principle.reproducibility]
+id = "P-004"
+status = "active"
+rule = "Experiments must be reproducible from the repository."
+test = "A documented experiment must provide enough information to reproduce its result."
+
+[principle.open_experimentation]
+id = "P-005"
+status = "active"
+rule = "OPTRIX must allow experimental implementations without treating them as established architecture."
+test = "Experimental components must be explicitly marked and isolated from stable components."
+
+[principle.falsifiability]
+id = "P-006"
+status = "active"
+rule = "Architectural claims must be testable and allowed to fail."
+test = "Each major research claim must define measurable evidence that could disprove it."
