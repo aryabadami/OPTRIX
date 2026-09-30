@@ -1,0 +1,23 @@
+project = "OPTRIX"
+version = "0.0.1"
+
+[scope]
+language = false
+frontend = false
+ir = false
+cpu_backend = false
+gpu_backend = false
+wasm_backend = false
+runtime = false
+ai_integration = false
+
+[research]
+phase = 0
+stage = "0.1"
+status = "foundation"
+
+[principles]
+correctness_first = true
+reproducible = true
+falsifiable = true
+incremental = true
