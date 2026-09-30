@@ -53,3 +53,13 @@ if __name__ == "__main__":
     test_lexer_tokenizes_basic_program()
     test_lexer_preserves_lexemes()
     print("PASS: lexer tests")
+
+
+def test_boolean_keywords():
+    tokens = Lexer("true false").tokenize()
+
+    assert tokens[0].type is TokenType.TRUE
+    assert tokens[0].lexeme == "true"
+
+    assert tokens[1].type is TokenType.FALSE
+    assert tokens[1].lexeme == "false"

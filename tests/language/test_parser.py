@@ -55,3 +55,21 @@ if __name__ == "__main__":
     test_parse_let_statement()
 
     print("PASS: parser tests")
+
+
+def test_parse_true():
+    node = parse_expression("true")
+
+    from language.optrix.ast import BooleanLiteral
+
+    assert isinstance(node, BooleanLiteral)
+    assert node.value is True
+
+
+def test_parse_false():
+    node = parse_expression("false")
+
+    from language.optrix.ast import BooleanLiteral
+
+    assert isinstance(node, BooleanLiteral)
+    assert node.value is False

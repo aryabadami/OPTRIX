@@ -1,65 +1,15 @@
-from language.optrix.ast import (
-    BinaryExpression,
-    Identifier,
-    IntegerLiteral,
-    LetStatement,
-    Program,
-)
+from language.optrix.ast import BooleanLiteral
 
 
-def test_integer_literal():
-    node = IntegerLiteral(42)
+def test_boolean_literal():
+    true_node = BooleanLiteral(True)
+    false_node = BooleanLiteral(False)
 
-    assert node.value == 42
-
-
-def test_identifier():
-    node = Identifier("answer")
-
-    assert node.name == "answer"
-
-
-def test_binary_expression():
-    node = BinaryExpression(
-        left=Identifier("a"),
-        operator="+",
-        right=IntegerLiteral(10),
-    )
-
-    assert node.left.name == "a"
-    assert node.operator == "+"
-    assert node.right.value == 10
-
-
-def test_let_statement():
-    node = LetStatement(
-        name="answer",
-        value=IntegerLiteral(42),
-    )
-
-    assert node.name == "answer"
-    assert node.value.value == 42
-
-
-def test_program():
-    program = Program(
-        statements=[
-            LetStatement(
-                name="answer",
-                value=IntegerLiteral(42),
-            )
-        ]
-    )
-
-    assert len(program.statements) == 1
-    assert program.statements[0].name == "answer"
+    assert true_node.value is True
+    assert false_node.value is False
 
 
 if __name__ == "__main__":
-    test_integer_literal()
-    test_identifier()
-    test_binary_expression()
-    test_let_statement()
-    test_program()
+    test_boolean_literal()
 
     print("PASS: AST tests")

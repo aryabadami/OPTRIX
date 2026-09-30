@@ -77,10 +77,15 @@ class Lexer:
 
         lexeme = self.source[start:self.position]
 
-        token_type = (
-            TokenType.LET
-            if lexeme == "let"
-            else TokenType.IDENTIFIER
+        keywords = {
+            "let": TokenType.LET,
+            "true": TokenType.TRUE,
+            "false": TokenType.FALSE,
+        }
+
+        token_type = keywords.get(
+            lexeme,
+            TokenType.IDENTIFIER,
         )
 
         return Token(token_type, lexeme, line, column)

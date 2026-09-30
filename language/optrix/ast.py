@@ -8,6 +8,11 @@ class IntegerLiteral:
 
 
 @dataclass(frozen=True)
+class BooleanLiteral:
+    value: bool
+
+
+@dataclass(frozen=True)
 class Identifier:
     name: str
 
@@ -21,6 +26,7 @@ class BinaryExpression:
 
 Expression = Union[
     IntegerLiteral,
+    BooleanLiteral,
     Identifier,
     BinaryExpression,
 ]

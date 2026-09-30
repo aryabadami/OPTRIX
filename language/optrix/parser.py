@@ -1,5 +1,6 @@
 from .ast import (
     BinaryExpression,
+    BooleanLiteral,
     Identifier,
     IntegerLiteral,
     LetStatement,
@@ -64,6 +65,14 @@ class Parser:
         if token.type == TokenType.INTEGER:
             self._advance()
             return IntegerLiteral(int(token.lexeme))
+
+        if token.type == TokenType.TRUE:
+            self._advance()
+            return BooleanLiteral(True)
+
+        if token.type == TokenType.FALSE:
+            self._advance()
+            return BooleanLiteral(False)
 
         if token.type == TokenType.IDENTIFIER:
             self._advance()

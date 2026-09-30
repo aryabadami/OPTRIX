@@ -6,6 +6,8 @@ class TokenType(Enum):
     LET = auto()
     IDENTIFIER = auto()
     INTEGER = auto()
+    TRUE = auto()
+    FALSE = auto()
 
     EQUAL = auto()
     PLUS = auto()
