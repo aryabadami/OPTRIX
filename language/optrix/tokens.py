@@ -9,6 +9,7 @@ class TokenType(Enum):
 
     EQUAL = auto()
     PLUS = auto()
+    NEWLINE = auto()
 
     EOF = auto()
 

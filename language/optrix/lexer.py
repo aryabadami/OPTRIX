@@ -19,6 +19,14 @@ class Lexer:
                 continue
 
             if char == "\n":
+                tokens.append(
+                    Token(
+                        TokenType.NEWLINE,
+                        "\\n",
+                        self.line,
+                        self.column,
+                    )
+                )
                 self._advance_line()
                 continue
 

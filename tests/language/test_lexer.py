@@ -16,11 +16,13 @@ let c = a + b"""
         TokenType.IDENTIFIER,
         TokenType.EQUAL,
         TokenType.INTEGER,
+        TokenType.NEWLINE,
 
         TokenType.LET,
         TokenType.IDENTIFIER,
         TokenType.EQUAL,
         TokenType.INTEGER,
+        TokenType.NEWLINE,
 
         TokenType.LET,
         TokenType.IDENTIFIER,
