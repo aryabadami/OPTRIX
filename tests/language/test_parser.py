@@ -73,3 +73,29 @@ def test_parse_false():
 
     assert isinstance(node, BooleanLiteral)
     assert node.value is False
+
+
+def test_integer_literal_preserves_source_location():
+    node = parse_expression("42")
+
+    from language.optrix.source import SourceLocation
+
+    assert node.location == SourceLocation(line=1, column=1)
+
+
+def test_identifier_preserves_source_location():
+    node = parse_expression("answer")
+
+    from language.optrix.source import SourceLocation
+
+    assert node.location == SourceLocation(line=1, column=1)
+
+
+def test_boolean_literal_preserves_source_location():
+    true_node = parse_expression("true")
+    false_node = parse_expression("false")
+
+    from language.optrix.source import SourceLocation
+
+    assert true_node.location == SourceLocation(line=1, column=1)
+    assert false_node.location == SourceLocation(line=1, column=1)

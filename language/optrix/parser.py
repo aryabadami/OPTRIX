@@ -64,19 +64,39 @@ class Parser:
 
         if token.type == TokenType.INTEGER:
             self._advance()
-            return IntegerLiteral(int(token.lexeme))
+            from .source import SourceLocation
+
+            return IntegerLiteral(
+                int(token.lexeme),
+                SourceLocation(token.line, token.column),
+            )
 
         if token.type == TokenType.TRUE:
             self._advance()
-            return BooleanLiteral(True)
+            from .source import SourceLocation
+
+            return BooleanLiteral(
+                True,
+                SourceLocation(token.line, token.column),
+            )
 
         if token.type == TokenType.FALSE:
             self._advance()
-            return BooleanLiteral(False)
+            from .source import SourceLocation
+
+            return BooleanLiteral(
+                False,
+                SourceLocation(token.line, token.column),
+            )
 
         if token.type == TokenType.IDENTIFIER:
             self._advance()
-            return Identifier(token.lexeme)
+            from .source import SourceLocation
+
+            return Identifier(
+                token.lexeme,
+                SourceLocation(token.line, token.column),
+            )
 
         raise SyntaxError(
             f"Expected expression at "

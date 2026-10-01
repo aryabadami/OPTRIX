@@ -1,20 +1,25 @@
 from dataclasses import dataclass
 from typing import Union
 
+from .source import SourceLocation
+
 
 @dataclass(frozen=True)
 class IntegerLiteral:
     value: int
+    location: SourceLocation | None = None
 
 
 @dataclass(frozen=True)
 class BooleanLiteral:
     value: bool
+    location: SourceLocation | None = None
 
 
 @dataclass(frozen=True)
 class Identifier:
     name: str
+    location: SourceLocation | None = None
 
 
 @dataclass(frozen=True)

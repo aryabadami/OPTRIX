@@ -1,3 +1,4 @@
+from ..diagnostics import Diagnostic
 from ..ast import (
     BinaryExpression,
     BooleanLiteral,
@@ -5,12 +6,22 @@ from ..ast import (
     IntegerLiteral,
     Program,
 )
+from ..source import SourceLocation
 from .symbols import SymbolTable
 from .types import BOOLEAN, INTEGER
 
 
 class SemanticError(Exception):
-    pass
+    def __init__(self, message: str, location: SourceLocation):
+        super().__init__(message)
+        self.message = message
+        self.location = location
+
+    def to_diagnostic(self) -> Diagnostic:
+        return Diagnostic(
+            message=self.message,
+            location=self.location,
+        )
 
 
 class SemanticAnalyzer:
@@ -35,7 +46,8 @@ class SemanticAnalyzer:
         if isinstance(expression, Identifier):
             if not self.symbols.is_defined(expression.name):
                 raise SemanticError(
-                    f"Undefined variable: {expression.name}"
+                    f"Undefined variable: {expression.name}",
+                    expression.location,
                 )
 
             return self.symbols.get_type(expression.name)
@@ -46,11 +58,13 @@ class SemanticAnalyzer:
 
             if left_type != INTEGER or right_type != INTEGER:
                 raise SemanticError(
-                    "Operator '+' requires integer operands"
+                    "Operator '+' requires integer operands",
+                    expression.left.location,
                 )
 
             return INTEGER
 
         raise SemanticError(
-            f"Unknown expression: {type(expression).__name__}"
+            f"Unknown expression: {type(expression).__name__}",
+            getattr(expression, "location", None),
         )

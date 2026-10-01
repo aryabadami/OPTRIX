@@ -93,3 +93,16 @@ if __name__ == "__main__":
     test_integer_and_boolean_cannot_be_added()
 
     print("PASS: semantic analyzer tests")
+
+
+def test_undefined_variable_error_has_location():
+    try:
+        analyze("let b = a")
+    except SemanticError as error:
+        from language.optrix.source import SourceLocation
+
+        assert error.location == SourceLocation(line=1, column=9)
+    else:
+        raise AssertionError(
+            "Expected SemanticError for undefined variable"
+        )
