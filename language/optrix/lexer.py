@@ -39,8 +39,65 @@ class Lexer:
                 continue
 
             if char == "=":
+                line = self.line
+                column = self.column
+
+                if (
+                    self.position + 1 < len(self.source)
+                    and self.source[self.position + 1] == "="
+                ):
+                    self._advance()
+                    self._advance()
+                    tokens.append(
+                        Token(
+                            TokenType.EQUAL_EQUAL,
+                            "==",
+                            line,
+                            column,
+                        )
+                    )
+                else:
+                    tokens.append(
+                        self._single_character(TokenType.EQUAL)
+                    )
+
+                continue
+
+            if char == "!":
+                line = self.line
+                column = self.column
+
+                if (
+                    self.position + 1 < len(self.source)
+                    and self.source[self.position + 1] == "="
+                ):
+                    self._advance()
+                    self._advance()
+                    tokens.append(
+                        Token(
+                            TokenType.NOT_EQUAL,
+                            "!=",
+                            line,
+                            column,
+                        )
+                    )
+                else:
+                    raise SyntaxError(
+                        f"Unexpected character '!' at "
+                        f"{line}:{column}"
+                    )
+
+                continue
+
+            if char == "<":
                 tokens.append(
-                    self._single_character(TokenType.EQUAL)
+                    self._single_character(TokenType.LESS)
+                )
+                continue
+
+            if char == ">":
+                tokens.append(
+                    self._single_character(TokenType.GREATER)
                 )
                 continue
 

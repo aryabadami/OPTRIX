@@ -66,6 +66,21 @@ class SemanticAnalyzer:
 
                 return INTEGER
 
+            if expression.operator in {
+                "<",
+                ">",
+                "==",
+                "!=",
+            }:
+                if left_type != INTEGER or right_type != INTEGER:
+                    raise SemanticError(
+                        f"Operator '{expression.operator}' "
+                        "requires integer operands",
+                        expression.left.location,
+                    )
+
+                return BOOLEAN
+
             raise SemanticError(
                 f"Unknown binary operator: {expression.operator}",
                 expression.left.location,

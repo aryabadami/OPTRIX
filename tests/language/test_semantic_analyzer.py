@@ -106,3 +106,40 @@ def test_undefined_variable_error_has_location():
         raise AssertionError(
             "Expected SemanticError for undefined variable"
         )
+
+
+def test_comparison_expressions_return_boolean():
+    for source in [
+        "10 < 20",
+        "10 > 20",
+        "10 == 20",
+        "10 != 20",
+    ]:
+        expression = Parser(
+            Lexer(source).tokenize()
+        ).parse_expression()
+
+        result = SemanticAnalyzer()._analyze_expression(expression)
+
+        assert result == BOOLEAN
+
+
+def test_comparison_requires_integer_operands():
+    for source in [
+        "true < 10",
+        "10 > true",
+        "true == 10",
+        "10 != true",
+    ]:
+        expression = Parser(
+            Lexer(source).tokenize()
+        ).parse_expression()
+
+        try:
+            SemanticAnalyzer()._analyze_expression(expression)
+        except SemanticError:
+            pass
+        else:
+            raise AssertionError(
+                f"Expected SemanticError for: {source}"
+            )

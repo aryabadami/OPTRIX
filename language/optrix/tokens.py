@@ -10,6 +10,10 @@ class TokenType(Enum):
     FALSE = auto()
 
     EQUAL = auto()
+    EQUAL_EQUAL = auto()
+    NOT_EQUAL = auto()
+    LESS = auto()
+    GREATER = auto()
     PLUS = auto()
     MINUS = auto()
     STAR = auto()
