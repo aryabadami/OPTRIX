@@ -1,6 +1,7 @@
 from ..diagnostics import Diagnostic
 from ..ast import (
     BinaryExpression,
+    UnaryExpression,
     BooleanLiteral,
     Identifier,
     IntegerLiteral,
@@ -52,6 +53,23 @@ class SemanticAnalyzer:
 
             return self.symbols.get_type(expression.name)
 
+        if isinstance(expression, UnaryExpression):
+            operand_type = self._analyze_expression(expression.operand)
+
+            if expression.operator == "!":
+                if operand_type != BOOLEAN:
+                    raise SemanticError(
+                        "Operator '!' requires a boolean operand",
+                        expression.operand.location,
+                    )
+
+                return BOOLEAN
+
+            raise SemanticError(
+                f"Unknown unary operator: {expression.operator}",
+                expression.operand.location,
+            )
+
         if isinstance(expression, BinaryExpression):
             left_type = self._analyze_expression(expression.left)
             right_type = self._analyze_expression(expression.right)
@@ -76,6 +94,16 @@ class SemanticAnalyzer:
                     raise SemanticError(
                         f"Operator '{expression.operator}' "
                         "requires integer operands",
+                        expression.left.location,
+                    )
+
+                return BOOLEAN
+
+            if expression.operator in {"&&", "||"}:
+                if left_type != BOOLEAN or right_type != BOOLEAN:
+                    raise SemanticError(
+                        f"Operator '{expression.operator}' "
+                        "requires boolean operands",
                         expression.left.location,
                     )
 

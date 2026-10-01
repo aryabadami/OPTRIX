@@ -14,6 +14,11 @@ class TokenType(Enum):
     NOT_EQUAL = auto()
     LESS = auto()
     GREATER = auto()
+
+    AND_AND = auto()
+    OR_OR = auto()
+    NOT = auto()
+
     PLUS = auto()
     MINUS = auto()
     STAR = auto()

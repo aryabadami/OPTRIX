@@ -29,11 +29,18 @@ class BinaryExpression:
     right: "Expression"
 
 
+@dataclass(frozen=True)
+class UnaryExpression:
+    operator: str
+    operand: "Expression"
+
+
 Expression = Union[
     IntegerLiteral,
     BooleanLiteral,
     Identifier,
     BinaryExpression,
+    UnaryExpression,
 ]
 
 

@@ -143,3 +143,41 @@ def test_comparison_requires_integer_operands():
             raise AssertionError(
                 f"Expected SemanticError for: {source}"
             )
+
+
+def test_boolean_expressions_return_boolean():
+    for source in [
+        "!true",
+        "!false",
+        "true && false",
+        "true || false",
+        "10 < 20 && 5 > 2",
+        "10 < 20 || 5 > 2",
+    ]:
+        expression = Parser(
+            Lexer(source).tokenize()
+        ).parse_expression()
+
+        result = SemanticAnalyzer()._analyze_expression(expression)
+
+        assert result == BOOLEAN
+
+
+def test_boolean_operators_require_boolean_operands():
+    for source in [
+        "!10",
+        "10 && true",
+        "true || 10",
+    ]:
+        expression = Parser(
+            Lexer(source).tokenize()
+        ).parse_expression()
+
+        try:
+            SemanticAnalyzer()._analyze_expression(expression)
+        except SemanticError:
+            pass
+        else:
+            raise AssertionError(
+                f"Expected SemanticError for: {source}"
+            )

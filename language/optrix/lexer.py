@@ -82,8 +82,59 @@ class Lexer:
                         )
                     )
                 else:
+                    tokens.append(
+                        self._single_character(TokenType.NOT)
+                    )
+
+                continue
+
+            if char == "&":
+                line = self.line
+                column = self.column
+
+                if (
+                    self.position + 1 < len(self.source)
+                    and self.source[self.position + 1] == "&"
+                ):
+                    self._advance()
+                    self._advance()
+                    tokens.append(
+                        Token(
+                            TokenType.AND_AND,
+                            "&&",
+                            line,
+                            column,
+                        )
+                    )
+                else:
                     raise SyntaxError(
-                        f"Unexpected character '!' at "
+                        f"Unexpected character '&' at "
+                        f"{line}:{column}"
+                    )
+
+                continue
+
+            if char == "|":
+                line = self.line
+                column = self.column
+
+                if (
+                    self.position + 1 < len(self.source)
+                    and self.source[self.position + 1] == "|"
+                ):
+                    self._advance()
+                    self._advance()
+                    tokens.append(
+                        Token(
+                            TokenType.OR_OR,
+                            "||",
+                            line,
+                            column,
+                        )
+                    )
+                else:
+                    raise SyntaxError(
+                        f"Unexpected character '|' at "
                         f"{line}:{column}"
                     )
 

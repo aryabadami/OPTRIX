@@ -1,5 +1,6 @@
 from .ast import (
     BinaryExpression,
+    UnaryExpression,
     BooleanLiteral,
     Identifier,
     IntegerLiteral,
@@ -16,7 +17,37 @@ class Parser:
         self.position = 0
 
     def parse_expression(self) -> Expression:
-        return self._parse_comparison()
+        return self._parse_logical_or()
+
+    def _parse_logical_or(self) -> Expression:
+        left = self._parse_logical_and()
+
+        while self._current().type == TokenType.OR_OR:
+            operator = self._advance().lexeme
+            right = self._parse_logical_and()
+
+            left = BinaryExpression(
+                left=left,
+                operator=operator,
+                right=right,
+            )
+
+        return left
+
+    def _parse_logical_and(self) -> Expression:
+        left = self._parse_comparison()
+
+        while self._current().type == TokenType.AND_AND:
+            operator = self._advance().lexeme
+            right = self._parse_comparison()
+
+            left = BinaryExpression(
+                left=left,
+                operator=operator,
+                right=right,
+            )
+
+        return left
 
     def _parse_comparison(self) -> Expression:
         left = self._parse_additive()
@@ -105,6 +136,14 @@ class Parser:
 
     def _parse_primary(self) -> Expression:
         token = self._current()
+
+        if token.type == TokenType.NOT:
+            self._advance()
+
+            return UnaryExpression(
+                operator="!",
+                operand=self._parse_primary(),
+            )
 
         if token.type == TokenType.INTEGER:
             self._advance()
