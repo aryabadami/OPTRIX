@@ -16,13 +16,37 @@ class Parser:
         self.position = 0
 
     def parse_expression(self) -> Expression:
+        return self._parse_additive()
+
+    def _parse_additive(self) -> Expression:
+        left = self._parse_multiplicative()
+
+        while self._current().type in (
+            TokenType.PLUS,
+            TokenType.MINUS,
+        ):
+            operator = self._advance().lexeme
+            right = self._parse_multiplicative()
+
+            left = BinaryExpression(
+                left=left,
+                operator=operator,
+                right=right,
+            )
+
+        return left
+
+    def _parse_multiplicative(self) -> Expression:
         left = self._parse_primary()
 
-        if self._current().type == TokenType.PLUS:
+        while self._current().type in (
+            TokenType.STAR,
+            TokenType.SLASH,
+        ):
             operator = self._advance().lexeme
             right = self._parse_primary()
 
-            return BinaryExpression(
+            left = BinaryExpression(
                 left=left,
                 operator=operator,
                 right=right,

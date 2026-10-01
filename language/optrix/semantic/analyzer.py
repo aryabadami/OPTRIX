@@ -56,13 +56,20 @@ class SemanticAnalyzer:
             left_type = self._analyze_expression(expression.left)
             right_type = self._analyze_expression(expression.right)
 
-            if left_type != INTEGER or right_type != INTEGER:
-                raise SemanticError(
-                    "Operator '+' requires integer operands",
-                    expression.left.location,
-                )
+            if expression.operator in {"+", "-", "*", "/"}:
+                if left_type != INTEGER or right_type != INTEGER:
+                    raise SemanticError(
+                        f"Operator '{expression.operator}' "
+                        "requires integer operands",
+                        expression.left.location,
+                    )
 
-            return INTEGER
+                return INTEGER
+
+            raise SemanticError(
+                f"Unknown binary operator: {expression.operator}",
+                expression.left.location,
+            )
 
         raise SemanticError(
             f"Unknown expression: {type(expression).__name__}",

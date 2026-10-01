@@ -34,3 +34,30 @@ def test_hello_program():
 if __name__ == "__main__":
     test_hello_program()
     print("PASS: complete frontend test")
+
+
+def test_arithmetic_program():
+    source = """
+let x = 10 + 2 * 3
+let y = x - 4
+let z = y / 2
+"""
+
+    tokens = Lexer(source).tokenize()
+    program = Parser(tokens).parse_program()
+
+    assert len(program.statements) == 3
+
+    x = program.statements[0]
+    assert x.name == "x"
+    assert isinstance(x.value, BinaryExpression)
+    assert x.value.operator == "+"
+    assert x.value.right.operator == "*"
+
+    y = program.statements[1]
+    assert y.name == "y"
+    assert y.value.operator == "-"
+
+    z = program.statements[2]
+    assert z.name == "z"
+    assert z.value.operator == "/"

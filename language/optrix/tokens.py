@@ -11,6 +11,9 @@ class TokenType(Enum):
 
     EQUAL = auto()
     PLUS = auto()
+    MINUS = auto()
+    STAR = auto()
+    SLASH = auto()
     NEWLINE = auto()
 
     EOF = auto()

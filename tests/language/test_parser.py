@@ -99,3 +99,25 @@ def test_boolean_literal_preserves_source_location():
 
     assert true_node.location == SourceLocation(line=1, column=1)
     assert false_node.location == SourceLocation(line=1, column=1)
+
+
+def test_arithmetic_operator_precedence():
+    expression = parse_expression("10 + 2 * 3")
+
+    assert expression.operator == "+"
+    assert expression.left.value == 10
+
+    assert expression.right.operator == "*"
+    assert expression.right.left.value == 2
+    assert expression.right.right.value == 3
+
+
+def test_arithmetic_operators():
+    for source, operator in [
+        ("10 - 3", "-"),
+        ("10 * 3", "*"),
+        ("10 / 3", "/"),
+    ]:
+        expression = parse_expression(source)
+
+        assert expression.operator == operator

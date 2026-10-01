@@ -7,6 +7,9 @@ def test_token_types_exist():
     assert TokenType.INTEGER
     assert TokenType.EQUAL
     assert TokenType.PLUS
+    assert TokenType.MINUS
+    assert TokenType.STAR
+    assert TokenType.SLASH
     assert TokenType.EOF
 
 

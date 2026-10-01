@@ -50,6 +50,24 @@ class Lexer:
                 )
                 continue
 
+            if char == "-":
+                tokens.append(
+                    self._single_character(TokenType.MINUS)
+                )
+                continue
+
+            if char == "*":
+                tokens.append(
+                    self._single_character(TokenType.STAR)
+                )
+                continue
+
+            if char == "/":
+                tokens.append(
+                    self._single_character(TokenType.SLASH)
+                )
+                continue
+
             raise SyntaxError(
                 f"Unexpected character '{char}' "
                 f"at {self.line}:{self.column}"
