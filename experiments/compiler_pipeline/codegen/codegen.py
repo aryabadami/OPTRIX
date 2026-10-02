@@ -1,3 +1,5 @@
+from opx_ast.ast import Number, BinaryOp
+
 from ir.ir import (
     Module,
     Function,
@@ -10,21 +12,21 @@ from ir.ir import (
     Return,
 )
 
-from opx_ast.ast import Number, BinaryOp
+from errors.errors import CodegenError
 
 
 def generate(expression):
     """
-    Convert an OPTRIX AST into a structured OPTRIX IR module.
+    Generate structured OPTRIX IR from an AST expression.
 
     AST
-      ↓
+        ↓
     Module
-      ↓
+        ↓
     Function
-      ↓
+        ↓
     BasicBlock
-      ↓
+        ↓
     Instructions
     """
 
@@ -36,77 +38,66 @@ def generate(expression):
 
     function.add_block(block)
 
-    def emit(node):
+    module.add_function(function)
 
-        # -------------------------
-        # NUMBER
-        # -------------------------
+    def emit(node):
+        # --------------------------------------------------
+        # Number
+        # --------------------------------------------------
 
         if isinstance(node, Number):
-
             block.add_instruction(
                 Push(node.value)
+            )
+            return
+
+        # --------------------------------------------------
+        # Binary operation
+        # --------------------------------------------------
+
+        if isinstance(node, BinaryOp):
+
+            emit(node.left)
+
+            emit(node.right)
+
+            operator_map = {
+                "+": Add,
+                "-": Sub,
+                "*": Mul,
+                "/": Div,
+            }
+
+            instruction_class = operator_map.get(
+                node.operator
+            )
+
+            if instruction_class is None:
+                raise CodegenError(
+                    f"Unsupported binary operator: "
+                    f"{node.operator!r}"
+                )
+
+            block.add_instruction(
+                instruction_class()
             )
 
             return
 
-        # -------------------------
-        # BINARY OPERATION
-        # -------------------------
+        # --------------------------------------------------
+        # Unsupported AST node
+        # --------------------------------------------------
 
-        if isinstance(node, BinaryOp):
-
-            # Generate left side first
-            emit(node.left)
-
-            # Generate right side second
-            emit(node.right)
-
-            # Generate operation
-            if node.operator == "+":
-
-                block.add_instruction(
-                    Add()
-                )
-
-            elif node.operator == "-":
-
-                block.add_instruction(
-                    Sub()
-                )
-
-            elif node.operator == "*":
-
-                block.add_instruction(
-                    Mul()
-                )
-
-            elif node.operator == "/":
-
-                block.add_instruction(
-                    Div()
-                )
-
-            else:
-
-                raise ValueError(
-                    f"Unsupported operator: {node.operator}"
-                )
-
-            return
-
-        raise TypeError(
-            f"Unsupported AST node: {type(node).__name__}"
+        raise CodegenError(
+            "Unsupported AST node: "
+            f"{type(node).__name__}"
         )
 
-    # Generate expression instructions
     emit(expression)
 
-    # Every expression currently returns its result
+    # Every generated function must terminate.
     block.add_instruction(
         Return()
     )
-
-    module.add_function(function)
 
     return module
