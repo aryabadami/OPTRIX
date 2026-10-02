@@ -4,7 +4,7 @@ from errors import ParserError
 
 
 def test_invalid_sources():
-    tests = [
+    sources = [
         "2 +",
         "2 + * 3",
         "(2 + 3",
@@ -13,15 +13,16 @@ def test_invalid_sources():
         "(2 + )",
     ]
 
-    for source in tests:
+    for source in sources:
         try:
             parse(lex(source))
         except ParserError as error:
             print(f"PASS: {source!r} -> {error}")
-        else:
-            raise AssertionError(
-                f"Parser accepted invalid source: {source!r}"
-            )
+            continue
+
+        raise AssertionError(
+            f"Expected ParserError for {source!r}"
+        )
 
 
 def test_error_information():
@@ -30,14 +31,27 @@ def test_error_information():
     except ParserError as error:
         assert error.phase == "Parser"
         assert error.line == 1
-        assert error.column == 3
+        assert error.column == 4
 
         print("PASS: ParserError metadata")
         return
 
-    raise AssertionError(
-        "Expected ParserError"
-    )
+    raise AssertionError("Expected ParserError")
+
+
+def test_token_location_is_used():
+    try:
+        parse(lex("2 + * 3"))
+    except ParserError as error:
+        assert error.phase == "Parser"
+        assert error.line == 1
+        assert error.column == 5
+        assert "Unexpected token: STAR" in str(error)
+
+        print("PASS: parser uses token location")
+        return
+
+    raise AssertionError("Expected ParserError")
 
 
 def main():
@@ -47,6 +61,7 @@ def main():
 
     test_invalid_sources()
     test_error_information()
+    test_token_location_is_used()
 
     print()
     print("ALL PARSER ERROR TESTS PASSED")

@@ -58,8 +58,8 @@ class Parser:
 
         raise ParserError(
             f"Unexpected token: {token.kind}",
-            line=1,
-            column=self.position + 1,
+            line=token.line,
+            column=token.column,
         )
 
     def parse_factor(self):

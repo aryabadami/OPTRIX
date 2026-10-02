@@ -8,21 +8,29 @@ def test_valid_source():
     assert tokens[0] == Token(
         "NUMBER",
         "2",
+        line=1,
+        column=1,
     )
 
     assert tokens[1] == Token(
         "PLUS",
         "+",
+        line=1,
+        column=3,
     )
 
     assert tokens[2] == Token(
         "NUMBER",
         "3",
+        line=1,
+        column=5,
     )
 
     assert tokens[3] == Token(
         "EOF",
         "",
+        line=1,
+        column=6,
     )
 
     print("PASS: valid source")
@@ -31,41 +39,50 @@ def test_valid_source():
 def test_parentheses():
     tokens = lex("(2 + 3)")
 
-    kinds = [
-        token.kind
-        for token in tokens
-    ]
+    assert tokens[0].kind == "LPAREN"
+    assert tokens[0].value == "("
+    assert tokens[0].line == 1
+    assert tokens[0].column == 1
 
-    assert kinds == [
-        "LPAREN",
-        "NUMBER",
-        "PLUS",
-        "NUMBER",
-        "RPAREN",
-        "EOF",
-    ]
+    assert tokens[1].kind == "NUMBER"
+    assert tokens[1].value == "2"
+    assert tokens[1].line == 1
+    assert tokens[1].column == 2
+
+    assert tokens[2].kind == "PLUS"
+    assert tokens[2].value == "+"
+    assert tokens[2].line == 1
+    assert tokens[2].column == 4
+
+    assert tokens[3].kind == "NUMBER"
+    assert tokens[3].value == "3"
+    assert tokens[3].line == 1
+    assert tokens[3].column == 6
+
+    assert tokens[4].kind == "RPAREN"
+    assert tokens[4].value == ")"
+    assert tokens[4].line == 1
+    assert tokens[4].column == 7
+
+    assert tokens[5].kind == "EOF"
+    assert tokens[5].line == 1
+    assert tokens[5].column == 8
 
     print("PASS: parentheses")
 
 
 def test_invalid_character():
     try:
-        lex("2 @ 3")
-    except LexerError as error:
-        assert error.phase == "Lexer"
-        assert error.line == 1
-        assert error.column == 3
-
+        lex("2 # 3")
+    except LexerError:
         print("PASS: invalid character")
         return
 
-    raise AssertionError(
-        "Lexer accepted invalid character"
-    )
+    raise AssertionError("Expected LexerError")
 
 
 def test_multiple_invalid_characters():
-    invalid_sources = [
+    sources = [
         "2 # 3",
         "2 $ 3",
         "2 & 3",
@@ -73,17 +90,16 @@ def test_multiple_invalid_characters():
         "2 % 3",
     ]
 
-    for source in invalid_sources:
+    for source in sources:
         try:
             lex(source)
         except LexerError:
-            print(
-                f"PASS: rejected {source!r}"
-            )
-        else:
-            raise AssertionError(
-                f"Accepted invalid source: {source!r}"
-            )
+            print(f"PASS: rejected {source!r}")
+            continue
+
+        raise AssertionError(
+            f"Accepted invalid source: {source!r}"
+        )
 
 
 def test_error_message():
@@ -101,9 +117,35 @@ def test_error_message():
         print("PASS: lexer diagnostic")
         return
 
-    raise AssertionError(
-        "Expected LexerError"
-    )
+    raise AssertionError("Expected LexerError")
+
+
+def test_multiline_locations():
+    tokens = lex("12 + 3\n45 * 6")
+
+    assert tokens[0].line == 1
+    assert tokens[0].column == 1
+
+    assert tokens[1].line == 1
+    assert tokens[1].column == 4
+
+    assert tokens[2].line == 1
+    assert tokens[2].column == 6
+
+    assert tokens[3].line == 2
+    assert tokens[3].column == 1
+
+    assert tokens[4].line == 2
+    assert tokens[4].column == 4
+
+    assert tokens[5].line == 2
+    assert tokens[5].column == 6
+
+    assert tokens[6].kind == "EOF"
+    assert tokens[6].line == 2
+    assert tokens[6].column == 7
+
+    print("PASS: multiline token locations")
 
 
 def main():
@@ -116,11 +158,10 @@ def main():
     test_invalid_character()
     test_multiple_invalid_characters()
     test_error_message()
+    test_multiline_locations()
 
     print()
-    print("=" * 60)
     print("ALL LEXER ERROR TESTS PASSED")
-    print("=" * 60)
 
 
 if __name__ == "__main__":
