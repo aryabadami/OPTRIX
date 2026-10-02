@@ -176,6 +176,37 @@ def test_parser_recovery_to_eof():
 
     print("PASS: parser recovery to EOF")
 
+
+def test_diagnostic_context():
+    error = ParserError(
+        "Unexpected token: STAR",
+        line=1,
+        column=5,
+        source="2 + * 3",
+    )
+
+    context = error.format_context()
+
+    assert context == "2 + * 3\n    ^"
+
+    print("PASS: diagnostic context")
+
+
+def test_multiline_diagnostic_context():
+    error = ParserError(
+        "Unexpected token: STAR",
+        line=2,
+        column=5,
+        source="2 + 3\n4 + * 5",
+    )
+
+    context = error.format_context()
+
+    assert context == "4 + * 5\n    ^"
+
+    print("PASS: multiline diagnostic context")
+
+
 def main():
     print("=" * 60)
     print("OPTRIX ERROR INFRASTRUCTURE TESTS")
@@ -194,6 +225,8 @@ def main():
     test_parser_recovery()
     test_parser_recovery_reaches_safe_token()
     test_parser_recovery_to_eof()
+    test_diagnostic_context()
+    test_multiline_diagnostic_context()
 
     print()
     print("=" * 60)

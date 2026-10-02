@@ -9,6 +9,7 @@ class CompilerError(Exception):
         phase=None,
         line=None,
         column=None,
+        source=None,
     ):
         super().__init__(message)
 
@@ -16,6 +17,23 @@ class CompilerError(Exception):
         self.phase = phase
         self.line = line
         self.column = column
+        self.source = source
+
+    def format_context(self):
+        if not self.source or self.line is None or self.column is None:
+            return ""
+
+        lines = self.source.splitlines()
+
+        if self.line < 1 or self.line > len(lines):
+            return ""
+
+        source_line = lines[self.line - 1]
+
+        caret_column = max(self.column - 1, 0)
+        caret = " " * caret_column + "^"
+
+        return f"{source_line}\n{caret}"
 
     def __str__(self):
         parts = []
@@ -68,12 +86,14 @@ class ParserError(CompilerError):
         message,
         line=None,
         column=None,
+        source=None,
     ):
         super().__init__(
             message,
             phase="Parser",
             line=line,
             column=column,
+            source=source,
         )
 
 
