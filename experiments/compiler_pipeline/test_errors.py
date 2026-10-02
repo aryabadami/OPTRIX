@@ -129,21 +129,18 @@ if __name__ == "__main__":
     main()
 
 def test_codegen_error_propagation():
-    from pipeline.compiler_pipeline import CompilerPipeline
     from opx_ast.ast import Number, BinaryOp
     from codegen.codegen import generate
     from errors import CodegenError
 
-    compiler = CompilerPipeline()
-
-    compiler.ast = BinaryOp(
+    compiler_ast = BinaryOp(
         left=Number(2),
         operator="%",
         right=Number(3),
     )
 
     try:
-        compiler.ir = generate(compiler.ast)
+        generate(compiler_ast)
 
     except CodegenError as error:
         print("PASS: codegen error propagation")
@@ -153,3 +150,28 @@ def test_codegen_error_propagation():
     raise AssertionError(
         "Expected CodegenError was not propagated"
     )
+
+
+def main():
+    print("=" * 60)
+    print("OPTRIX ERROR INFRASTRUCTURE TESTS")
+    print("=" * 60)
+
+    test_base_error()
+    test_lexer_error()
+    test_parser_error()
+    test_semantic_error()
+    test_codegen_error()
+    test_ir_verification_error()
+    test_runtime_error()
+    test_string_formatting()
+    test_codegen_error_propagation()
+
+    print()
+    print("=" * 60)
+    print("ALL ERROR TESTS PASSED")
+    print("=" * 60)
+
+
+if __name__ == "__main__":
+    main()
