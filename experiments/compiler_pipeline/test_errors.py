@@ -104,30 +104,6 @@ def test_string_formatting():
 
     print("PASS: error formatting")
 
-
-def main():
-    print("=" * 60)
-    print("OPTRIX ERROR INFRASTRUCTURE TESTS")
-    print("=" * 60)
-
-    test_base_error()
-    test_lexer_error()
-    test_parser_error()
-    test_semantic_error()
-    test_codegen_error()
-    test_ir_verification_error()
-    test_runtime_error()
-    test_string_formatting()
-
-    print()
-    print("=" * 60)
-    print("ALL ERROR TESTS PASSED")
-    print("=" * 60)
-
-
-if __name__ == "__main__":
-    main()
-
 def test_codegen_error_propagation():
     from opx_ast.ast import Number, BinaryOp
     from codegen.codegen import generate
@@ -151,6 +127,54 @@ def test_codegen_error_propagation():
         "Expected CodegenError was not propagated"
     )
 
+def test_parser_recovery():
+    from lexer.lexer import lex
+    from parser.parser import Parser
+
+    tokens = lex("2 + + 3")
+
+    parser = Parser(tokens)
+
+    result = parser.parse()
+
+    assert result is None
+    assert len(parser.errors) == 1
+    assert isinstance(parser.errors[0], ParserError)
+
+    print("PASS: parser error recovery")
+
+
+def test_parser_recovery_reaches_safe_token():
+    from lexer.lexer import lex
+    from parser.parser import Parser
+
+    tokens = lex("2 + + 3")
+
+    parser = Parser(tokens)
+
+    parser.parse()
+
+    assert parser.position < len(tokens)
+    assert parser.current().kind == "NUMBER"
+
+    print("PASS: parser recovery synchronization")
+
+
+def test_parser_recovery_to_eof():
+    from lexer.lexer import lex
+    from parser.parser import Parser
+
+    tokens = lex("2 +")
+
+    parser = Parser(tokens)
+
+    result = parser.parse()
+
+    assert result is None
+    assert len(parser.errors) == 1
+    assert parser.current().kind == "EOF"
+
+    print("PASS: parser recovery to EOF")
 
 def main():
     print("=" * 60)
@@ -167,6 +191,10 @@ def main():
     test_string_formatting()
     test_codegen_error_propagation()
 
+    test_parser_recovery()
+    test_parser_recovery_reaches_safe_token()
+    test_parser_recovery_to_eof()
+
     print()
     print("=" * 60)
     print("ALL ERROR TESTS PASSED")
@@ -175,3 +203,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
