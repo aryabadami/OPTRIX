@@ -1,0 +1,136 @@
+from dataclasses import dataclass
+
+from lexer.lexer import Token
+
+
+@dataclass
+class Number:
+    value: int
+
+
+@dataclass
+class BinaryOp:
+    left: object
+    operator: str
+    right: object
+
+
+class Parser:
+    def __init__(self, tokens: list[Token]):
+        self.tokens = tokens
+        self.position = 0
+
+    def current(self) -> Token:
+        return self.tokens[self.position]
+
+    def consume(self, kind: str) -> Token:
+        token = self.current()
+
+        if token.kind != kind:
+            raise SyntaxError(
+                f"Expected {kind}, got {token.kind}"
+            )
+
+        self.position += 1
+        return token
+
+    def parse_primary(self):
+        """
+        primary:
+            NUMBER
+            '(' expression ')'
+        """
+
+        token = self.current()
+
+        if token.kind == "NUMBER":
+            return self.parse_number()
+
+        if token.kind == "LPAREN":
+            self.consume("LPAREN")
+
+            expression = self.parse_expression()
+
+            self.consume("RPAREN")
+
+            return expression
+
+        raise SyntaxError(
+            f"Expected NUMBER or LPAREN, got {token.kind}"
+        )
+
+    def parse_number(self):
+        token = self.consume("NUMBER")
+
+        return Number(
+            int(token.value)
+        )
+
+    def parse_factor(self):
+        """
+        factor:
+            primary
+            primary * primary
+            primary / primary
+        """
+
+        left = self.parse_primary()
+
+        while self.current().kind in {
+            "STAR",
+            "SLASH",
+        }:
+            operator = self.current()
+
+            self.position += 1
+
+            right = self.parse_primary()
+
+            left = BinaryOp(
+                left=left,
+                operator=operator.value,
+                right=right,
+            )
+
+        return left
+
+    def parse_expression(self):
+        """
+        expression:
+            factor
+            expression + factor
+            expression - factor
+        """
+
+        left = self.parse_factor()
+
+        while self.current().kind in {
+            "PLUS",
+            "MINUS",
+        }:
+            operator = self.current()
+
+            self.position += 1
+
+            right = self.parse_factor()
+
+            left = BinaryOp(
+                left=left,
+                operator=operator.value,
+                right=right,
+            )
+
+        return left
+
+    def parse(self):
+        expression = self.parse_expression()
+
+        self.consume("EOF")
+
+        return expression
+
+
+def parse(tokens: list[Token]):
+    parser = Parser(tokens)
+
+    return parser.parse()

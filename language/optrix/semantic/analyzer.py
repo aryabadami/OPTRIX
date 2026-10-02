@@ -1,11 +1,15 @@
 from ..diagnostics import Diagnostic
 from ..ast import (
     BinaryExpression,
-    UnaryExpression,
+    Block,
     BooleanLiteral,
     Identifier,
+    IfStatement,
     IntegerLiteral,
+    LetStatement,
     Program,
+    UnaryExpression,
+    WhileStatement,
 )
 from ..source import SourceLocation
 from .symbols import SymbolTable
@@ -34,8 +38,47 @@ class SemanticAnalyzer:
             self._analyze_statement(statement)
 
     def _analyze_statement(self, statement) -> None:
-        value_type = self._analyze_expression(statement.value)
-        self.symbols.define(statement.name, value_type)
+        if isinstance(statement, LetStatement):
+            value_type = self._analyze_expression(statement.value)
+            self.symbols.define(statement.name, value_type)
+            return
+
+        if isinstance(statement, IfStatement):
+            condition_type = self._analyze_expression(statement.condition)
+
+            if condition_type != BOOLEAN:
+                raise SemanticError(
+                    "If condition requires a boolean expression",
+                    statement.condition.location,
+                )
+
+            self._analyze_block(statement.then_branch)
+
+            if statement.else_branch is not None:
+                self._analyze_block(statement.else_branch)
+
+            return
+
+        if isinstance(statement, WhileStatement):
+            condition_type = self._analyze_expression(statement.condition)
+
+            if condition_type != BOOLEAN:
+                raise SemanticError(
+                    "While condition requires a boolean expression",
+                    statement.condition.location,
+                )
+
+            self._analyze_block(statement.body)
+            return
+
+        raise SemanticError(
+            f"Unknown statement: {type(statement).__name__}",
+            getattr(statement, "location", None),
+        )
+
+    def _analyze_block(self, block: Block) -> None:
+        for statement in block.statements:
+            self._analyze_statement(statement)
 
     def _analyze_expression(self, expression):
         if isinstance(expression, IntegerLiteral):

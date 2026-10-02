@@ -1,0 +1,56 @@
+from lexer.lexer import lex
+from parser.parser import parse
+from codegen.codegen import generate
+from ir.verifier import IRVerifier
+from ir.executor import IRExecutor
+
+
+class CompilerPipeline:
+    """
+    Complete experimental OPTRIX compiler pipeline.
+
+    SOURCE
+        ↓
+    LEXER
+        ↓
+    PARSER
+        ↓
+    AST
+        ↓
+    CODEGEN
+        ↓
+    IR
+        ↓
+    VERIFIER
+        ↓
+    EXECUTOR
+        ↓
+    RESULT
+    """
+
+    def __init__(self):
+        self.tokens = None
+        self.ast = None
+        self.ir = None
+        self.result = None
+
+        self.verifier = IRVerifier()
+        self.executor = IRExecutor()
+
+    def compile(self, source):
+        # 1. Lexing
+        self.tokens = lex(source)
+
+        # 2. Parsing
+        self.ast = parse(self.tokens)
+
+        # 3. Code generation
+        self.ir = generate(self.ast)
+
+        # 4. IR verification
+        self.verifier.verify(self.ir)
+
+        # 5. IR execution
+        self.result = self.executor.execute(self.ir)
+
+        return self.result

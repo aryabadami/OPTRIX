@@ -51,5 +51,30 @@ class LetStatement:
 
 
 @dataclass(frozen=True)
+class Block:
+    statements: list["Statement"]
+
+
+@dataclass(frozen=True)
+class IfStatement:
+    condition: Expression
+    then_branch: Block
+    else_branch: Block | None = None
+
+
+@dataclass(frozen=True)
+class WhileStatement:
+    condition: Expression
+    body: Block
+
+
+Statement = Union[
+    LetStatement,
+    IfStatement,
+    WhileStatement,
+]
+
+
+@dataclass(frozen=True)
 class Program:
-    statements: list[LetStatement]
+    statements: list["Statement"]

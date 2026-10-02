@@ -1,6 +1,10 @@
 from .ast import (
     BinaryExpression,
     UnaryExpression,
+    Block,
+    IfStatement,
+    WhileStatement,
+    Statement,
     BooleanLiteral,
     Identifier,
     IntegerLiteral,
@@ -113,9 +117,77 @@ class Parser:
                 self._advance()
                 continue
 
-            statements.append(self._parse_let_statement())
+            statements.append(self._parse_statement())
 
         return Program(statements)
+
+    def _parse_statement(self) -> Statement:
+        if self._current().type == TokenType.LET:
+            return self._parse_let_statement()
+
+        if self._current().type == TokenType.IF:
+            return self._parse_if_statement()
+
+        if self._current().type == TokenType.WHILE:
+            return self._parse_while_statement()
+
+        token = self._current()
+
+        raise SyntaxError(
+            f"Unexpected statement {token.type.name} "
+            f"at {token.line}:{token.column}"
+        )
+
+    def _parse_while_statement(self) -> WhileStatement:
+        self._expect(TokenType.WHILE)
+
+        condition = self.parse_expression()
+        body = self._parse_block()
+
+        return WhileStatement(
+            condition=condition,
+            body=body,
+        )
+
+
+    def _parse_if_statement(self) -> IfStatement:
+        self._expect(TokenType.IF)
+
+        condition = self.parse_expression()
+        then_branch = self._parse_block()
+
+        else_branch = None
+
+        if self._current().type == TokenType.ELSE:
+            self._advance()
+            else_branch = self._parse_block()
+
+        return IfStatement(
+            condition=condition,
+            then_branch=then_branch,
+            else_branch=else_branch,
+        )
+
+
+    def _parse_block(self) -> Block:
+        self._expect(TokenType.LEFT_BRACE)
+
+        statements = []
+
+        while self._current().type not in (
+            TokenType.RIGHT_BRACE,
+            TokenType.EOF,
+        ):
+            if self._current().type == TokenType.NEWLINE:
+                self._advance()
+                continue
+
+            statements.append(self._parse_statement())
+
+        self._expect(TokenType.RIGHT_BRACE)
+
+        return Block(statements)
+
 
     def _parse_let_statement(self) -> LetStatement:
         self._expect(TokenType.LET)

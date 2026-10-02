@@ -1,0 +1,173 @@
+class IRVerificationError(Exception):
+    """Raised when OPTRIX IR is invalid."""
+
+
+class IRVerifier:
+    """
+    Verifies the structural and basic semantic validity
+    of an OPTRIX IR module.
+
+    This verifier also tracks the virtual operand stack.
+    """
+
+    VALID_INSTRUCTIONS = {
+        "Push",
+        "Add",
+        "Sub",
+        "Mul",
+        "Div",
+        "Return",
+    }
+
+    def verify(self, module):
+        self.verify_module(module)
+        return True
+
+    # --------------------------------------------------
+    # MODULE
+    # --------------------------------------------------
+
+    def verify_module(self, module):
+        if module is None:
+            raise IRVerificationError(
+                "Module cannot be None"
+            )
+
+        if not hasattr(module, "functions"):
+            raise IRVerificationError(
+                "Module is missing functions"
+            )
+
+        if not module.functions:
+            raise IRVerificationError(
+                "Module contains no functions"
+            )
+
+        for function in module.functions:
+            self.verify_function(function)
+
+    # --------------------------------------------------
+    # FUNCTION
+    # --------------------------------------------------
+
+    def verify_function(self, function):
+        if not getattr(function, "name", None):
+            raise IRVerificationError(
+                "Function is missing a name"
+            )
+
+        if not hasattr(function, "blocks"):
+            raise IRVerificationError(
+                f"Function '{function.name}' is missing blocks"
+            )
+
+        if not function.blocks:
+            raise IRVerificationError(
+                f"Function '{function.name}' contains no blocks"
+            )
+
+        for block in function.blocks:
+            self.verify_block(function, block)
+
+    # --------------------------------------------------
+    # BLOCK
+    # --------------------------------------------------
+
+    def verify_block(self, function, block):
+        if not getattr(block, "name", None):
+            raise IRVerificationError(
+                f"Function '{function.name}' contains "
+                "a block without a name"
+            )
+
+        if not hasattr(block, "instructions"):
+            raise IRVerificationError(
+                f"Block '{block.name}' is missing instructions"
+            )
+
+        if not block.instructions:
+            raise IRVerificationError(
+                f"Block '{block.name}' contains no instructions"
+            )
+
+        stack_depth = 0
+
+        for instruction in block.instructions:
+            stack_depth = self.verify_instruction(
+                function,
+                block,
+                instruction,
+                stack_depth,
+            )
+
+    # --------------------------------------------------
+    # INSTRUCTION
+    # --------------------------------------------------
+
+    def verify_instruction(
+        self,
+        function,
+        block,
+        instruction,
+        stack_depth,
+    ):
+        instruction_name = type(instruction).__name__
+
+        if instruction_name not in self.VALID_INSTRUCTIONS:
+            raise IRVerificationError(
+                f"Unknown instruction "
+                f"'{instruction_name}' "
+                f"in block '{block.name}' "
+                f"of function '{function.name}'"
+            )
+
+        # ----------------------------------------------
+        # PUSH
+        # ----------------------------------------------
+
+        if instruction_name == "Push":
+            if not hasattr(instruction, "value"):
+                raise IRVerificationError(
+                    "Push instruction is missing value"
+                )
+
+            return stack_depth + 1
+
+        # ----------------------------------------------
+        # BINARY OPERATIONS
+        # ----------------------------------------------
+
+        if instruction_name in {
+            "Add",
+            "Sub",
+            "Mul",
+            "Div",
+        }:
+            if stack_depth < 2:
+                raise IRVerificationError(
+                    f"{instruction_name} requires "
+                    f"2 stack values, "
+                    f"but only {stack_depth} available "
+                    f"in block '{block.name}'"
+                )
+
+            return stack_depth - 1
+
+        # ----------------------------------------------
+        # RETURN
+        # ----------------------------------------------
+
+        if instruction_name == "Return":
+            if stack_depth < 1:
+                raise IRVerificationError(
+                    f"Return requires "
+                    f"1 stack value, "
+                    f"but stack is empty "
+                    f"in block '{block.name}'"
+                )
+
+            return stack_depth - 1
+
+        raise IRVerificationError(
+            f"Unhandled instruction '{instruction_name}'"
+        )

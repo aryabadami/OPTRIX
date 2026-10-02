@@ -1,0 +1,119 @@
+from lexer.lexer import lex
+from parser.parser import parse
+from codegen.codegen import generate
+
+from ir.verifier import (
+    IRVerifier,
+    IRVerificationError,
+)
+
+
+def build_ir(source):
+    ast = parse(lex(source))
+    return generate(ast)
+
+
+def test_valid_programs():
+    programs = [
+        "2 + 3",
+        "10 - 4",
+        "5 * 6",
+        "20 / 5",
+        "(2 + 3) * 4",
+        "2 + 3 * 4",
+    ]
+
+    verifier = IRVerifier()
+
+    for source in programs:
+        module = build_ir(source)
+
+        result = verifier.verify(module)
+
+        if result is not True:
+            raise AssertionError(
+                f"Verification failed for: {source}"
+            )
+
+        print(
+            f"PASS: valid IR -> {source}"
+        )
+
+
+def test_invalid_module():
+    verifier = IRVerifier()
+
+    try:
+        verifier.verify(None)
+    except IRVerificationError:
+        print(
+            "PASS: invalid module rejected"
+        )
+        return
+
+    raise AssertionError(
+        "Invalid module was not rejected"
+    )
+
+
+def test_unknown_instruction():
+    from ir.ir import (
+        Module,
+        Function,
+        BasicBlock,
+    )
+
+    class FakeInstruction:
+        pass
+
+    module = Module("invalid")
+
+    function = Function("main")
+
+    block = BasicBlock("entry")
+
+    block.add_instruction(
+        FakeInstruction()
+    )
+
+    function.add_block(block)
+
+    module.add_function(function)
+
+    verifier = IRVerifier()
+
+    try:
+        verifier.verify(module)
+    except IRVerificationError:
+        print(
+            "PASS: unknown instruction rejected"
+        )
+        return
+
+    raise AssertionError(
+        "Unknown instruction was not rejected"
+    )
+
+
+def main():
+    print("=" * 60)
+    print("OPTRIX IR VERIFIER TESTS")
+    print("=" * 60)
+    print()
+
+    test_valid_programs()
+
+    print()
+
+    test_invalid_module()
+
+    test_unknown_instruction()
+
+    print()
+    print("=" * 60)
+    print("ALL VERIFIER TESTS PASSED")
+    print("=" * 60)
+
+
+if __name__ == "__main__":
+    main()

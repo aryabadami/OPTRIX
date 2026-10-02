@@ -1,12 +1,6 @@
-# Python
 __pycache__/
-*.py[cod]
-*$py.class
-
-# Virtual environments
+*.pyc
+.DS_Store
 .venv/
 venv/
-env/
-
-# macOS
-.DS_Store
+.env

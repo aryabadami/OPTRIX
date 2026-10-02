@@ -181,3 +181,76 @@ def test_boolean_operators_require_boolean_operands():
             raise AssertionError(
                 f"Expected SemanticError for: {source}"
             )
+
+
+def test_if_requires_boolean_condition():
+    source = """if 10 {
+    let x = 1
+}"""
+
+    program = Parser(
+        Lexer(source).tokenize()
+    ).parse_program()
+
+    try:
+        SemanticAnalyzer().analyze(program)
+    except SemanticError as error:
+        assert "If condition requires a boolean expression" in error.message
+    else:
+        raise AssertionError("Expected IF condition type error")
+
+
+def test_while_requires_boolean_condition():
+    source = """while 10 {
+    let x = 1
+}"""
+
+    program = Parser(
+        Lexer(source).tokenize()
+    ).parse_program()
+
+    try:
+        SemanticAnalyzer().analyze(program)
+    except SemanticError as error:
+        assert "While condition requires a boolean expression" in error.message
+    else:
+        raise AssertionError("Expected WHILE condition type error")
+
+
+def test_nested_control_flow_semantics():
+    source = """while true {
+    if false {
+        let x = 1
+    } else {
+        let y = 2
+    }
+}"""
+
+    program = Parser(
+        Lexer(source).tokenize()
+    ).parse_program()
+
+    SemanticAnalyzer().analyze(program)
+
+
+def test_nested_else_semantic_error():
+    source = """while true {
+    if false {
+        let x = 1
+    } else {
+        let y = unknown_variable
+    }
+}"""
+
+    program = Parser(
+        Lexer(source).tokenize()
+    ).parse_program()
+
+    try:
+        SemanticAnalyzer().analyze(program)
+    except SemanticError:
+        pass
+    else:
+        raise AssertionError(
+            "Expected nested ELSE semantic error"
+        )

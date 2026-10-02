@@ -1,0 +1,106 @@
+class IRVerificationError(Exception):
+    """Raised when OPTRIX IR is invalid."""
+
+
+class IRVerifier:
+    """
+    Verifies the structural and basic semantic validity
+    of an OPTRIX IR module.
+    """
+
+    def verify(self, module):
+        self.verify_module(module)
+        return True
+
+    def verify_module(self, module):
+        if module is None:
+            raise IRVerificationError(
+                "Module cannot be None"
+            )
+
+        if not hasattr(module, "functions"):
+            raise IRVerificationError(
+                "Module is missing functions"
+            )
+
+        if not module.functions:
+            raise IRVerificationError(
+                "Module contains no functions"
+            )
+
+        for function in module.functions:
+            self.verify_function(function)
+
+    def verify_function(self, function):
+        if not getattr(function, "name", None):
+            raise IRVerificationError(
+                "Function is missing a name"
+            )
+
+        if not hasattr(function, "blocks"):
+            raise IRVerificationError(
+                f"Function '{function.name}' is missing blocks"
+            )
+
+        if not function.blocks:
+            raise IRVerificationError(
+                f"Function '{function.name}' contains no blocks"
+            )
+
+        for block in function.blocks:
+            self.verify_block(function, block)
+
+    def verify_block(self, function, block):
+        if not getattr(block, "name", None):
+            raise IRVerificationError(
+                f"Function '{function.name}' contains "
+                "a block without a name"
+            )
+
+        if not hasattr(block, "instructions"):
+            raise IRVerificationError(
+                f"Block '{block.name}' is missing instructions"
+            )
+
+        if not block.instructions:
+            raise IRVerificationError(
+                f"Block '{block.name}' contains no instructions"
+            )
+
+        for instruction in block.instructions:
+            self.verify_instruction(
+                function,
+                block,
+                instruction,
+            )
+
+    def verify_instruction(
+        self,
+        function,
+        block,
+        instruction,
+    ):
+        instruction_name = type(instruction).__name__
+
+        valid_instructions = {
+            "Push",
+            "Add",
+            "Sub",
+            "Mul",
+            "Div",
+            "Return",
+        }
+
+        if instruction_name not in valid_instructions:
+            raise IRVerificationError(
+                f"Unknown instruction "
+                f"'{instruction_name}' "
+                f"in block '{block.name}' "
+                f"of function '{function.name}'"
+            )
+
+        if instruction_name == "Push":
+            if not hasattr(instruction, "value"):
+                raise IRVerificationError(
+                    "Push instruction is missing value"
+                )

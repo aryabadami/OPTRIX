@@ -4,6 +4,11 @@ from enum import Enum, auto
 
 class TokenType(Enum):
     LET = auto()
+    IF = auto()
+    ELSE = auto()
+    WHILE = auto()
+    LEFT_BRACE = auto()
+    RIGHT_BRACE = auto()
     IDENTIFIER = auto()
     INTEGER = auto()
     TRUE = auto()

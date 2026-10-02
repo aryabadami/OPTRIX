@@ -158,6 +158,18 @@ class Lexer:
                 )
                 continue
 
+            if char == "{":
+                tokens.append(
+                    self._single_character(TokenType.LEFT_BRACE)
+                )
+                continue
+
+            if char == "}":
+                tokens.append(
+                    self._single_character(TokenType.RIGHT_BRACE)
+                )
+                continue
+
             if char == "-":
                 tokens.append(
                     self._single_character(TokenType.MINUS)
@@ -205,6 +217,9 @@ class Lexer:
 
         keywords = {
             "let": TokenType.LET,
+            "if": TokenType.IF,
+            "else": TokenType.ELSE,
+            "while": TokenType.WHILE,
             "true": TokenType.TRUE,
             "false": TokenType.FALSE,
         }
