@@ -26,8 +26,8 @@ class Parser:
         if token.kind != kind:
             raise ParserError(
                 f"Expected {kind}, got {token.kind}",
-                line=1,
-                column=self.position + 1,
+                line=token.line,
+                column=token.column,
             )
 
         self.advance()
