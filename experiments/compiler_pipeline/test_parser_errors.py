@@ -15,7 +15,7 @@ def test_invalid_sources():
 
     for source in sources:
         try:
-            parse(lex(source))
+            parse(lex(source), source)
         except ParserError as error:
             print(f"PASS: {source!r} -> {error}")
             continue
@@ -26,12 +26,15 @@ def test_invalid_sources():
 
 
 def test_error_information():
+    source = "2 +"
+
     try:
-        parse(lex("2 +"))
+        parse(lex(source), source)
     except ParserError as error:
         assert error.phase == "Parser"
         assert error.line == 1
         assert error.column == 4
+        assert error.source == source
 
         print("PASS: ParserError metadata")
         return
@@ -40,8 +43,10 @@ def test_error_information():
 
 
 def test_token_location_is_used():
+    source = "2 + * 3"
+
     try:
-        parse(lex("2 + * 3"))
+        parse(lex(source), source)
     except ParserError as error:
         assert error.phase == "Parser"
         assert error.line == 1
@@ -49,6 +54,23 @@ def test_token_location_is_used():
         assert "Unexpected token: STAR" in str(error)
 
         print("PASS: parser uses token location")
+        return
+
+    raise AssertionError("Expected ParserError")
+
+
+def test_source_context():
+    source = "2 + * 3"
+
+    try:
+        parse(lex(source), source)
+    except ParserError as error:
+        formatted = str(error)
+
+        assert "2 + * 3" in formatted
+        assert "^" in formatted
+
+        print("PASS: parser source context")
         return
 
     raise AssertionError("Expected ParserError")
@@ -62,6 +84,7 @@ def main():
     test_invalid_sources()
     test_error_information()
     test_token_location_is_used()
+    test_source_context()
 
     print()
     print("ALL PARSER ERROR TESTS PASSED")

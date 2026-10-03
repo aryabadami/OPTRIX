@@ -54,7 +54,14 @@ class CompilerError(Exception):
                 + ")"
             )
 
-        return " ".join(parts)
+        result = " ".join(parts)
+
+        context = self.format_context()
+
+        if context:
+            result += f"\n\n{context}"
+
+        return result
 
 
 class LexerError(CompilerError):

@@ -56,7 +56,7 @@ class CompilerPipeline:
         # 2. PARSE
         # ----------------------------------------------
 
-        self.ast = parse(self.tokens)
+        self.ast = parse(self.tokens, self.source)
 
         # ----------------------------------------------
         # 3. CODE GENERATION

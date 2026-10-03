@@ -4,8 +4,9 @@ from opx_ast.ast import Number, BinaryOp
 
 class Parser:
 
-    def __init__(self, tokens):
+    def __init__(self, tokens, source=None):
         self.tokens = tokens
+        self.source = source
         self.position = 0
         self.errors = []
 
@@ -28,6 +29,7 @@ class Parser:
                 f"Expected {kind}, got {token.kind}",
                 line=token.line,
                 column=token.column,
+                source=self.source,
             )
 
         self.advance()
@@ -60,6 +62,7 @@ class Parser:
             f"Unexpected token: {token.kind}",
             line=token.line,
             column=token.column,
+            source=self.source,
         )
 
     def parse_factor(self):
@@ -101,21 +104,11 @@ class Parser:
         return left
 
     def synchronize(self):
-        """
-        Recover from a parser error.
-
-        Advance until a token is reached that can safely
-        represent the beginning of another expression.
-        """
-
-        while self.current().kind != "EOF":
-
-            if self.current().kind in {
-                "NUMBER",
-                "LPAREN",
-            }:
-                return
-
+        while self.current().kind not in {
+            "EOF",
+            "NUMBER",
+            "LPAREN",
+        }:
             self.advance()
 
     def parse(self):
@@ -136,8 +129,8 @@ class Parser:
             return None
 
 
-def parse(tokens):
-    parser = Parser(tokens)
+def parse(tokens, source=None):
+    parser = Parser(tokens, source=source)
 
     result = parser.parse()
 
